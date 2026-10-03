@@ -1,0 +1,10 @@
+@model ContactMessageStatus
+@{
+    var (text, css) = Model switch
+    {
+        ContactMessageStatus.New => ("Yeni", "text-bg-warning"),
+        ContactMessageStatus.Read => ("Okundu", "text-bg-light border"),
+        _ => ("Yanıtlandı", "text-bg-success")
+    };
+}
+<span class="badge @css">@text</span>

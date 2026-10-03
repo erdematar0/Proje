@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Sık sorulan sorular";
+    var faqs = new (string Q, string A)[]
+    {
+        ("Siparişimi nasıl takip edebilirim?", "Giriş yaptıktan sonra sağ üstteki menüden <a href=\"/Order/MyOrders\">Siparişlerim</a> sayfasına giderek tüm siparişlerinin durumunu (ödendi, kargoda, teslim edildi) görebilirsin."),
+        ("Kargo ücreti ne kadar?", "Tüm siparişlerde kargo ücretsizdir. Siparişler 1–3 iş gününde kargoya verilir. Ayrıntılar için <a href=\"/kargo-ve-teslimat\">Kargo ve teslimat</a> sayfasına bakabilirsin."),
+        ("Hangi ödeme yöntemlerini kullanabilirim?", "Kredi kartı ve banka kartı ile ödeme yapabilirsin. Kredi kartlarında, ürün tutarına göre 12 aya varan taksit seçenekleri ürün sayfasındaki <strong>Taksit seçenekleri</strong> sekmesinde listelenir."),
+        ("Kart bilgilerim saklanıyor mu?", "Hayır. Kart numaran, son kullanma tarihi ve CVV bilgin sistemimizde saklanmaz; siparişte yalnızca kartının son 4 hanesi görünür."),
+        ("Siparişimi iptal edebilir miyim?", "Siparişin kargoya verilmeden önce ücretsiz iptal edilebilir. <a href=\"/Contact\">İletişim formundan</a> sipariş numaranla talep oluşturman yeterli."),
+        ("Ürünü nasıl iade ederim?", "Teslimattan itibaren 14 gün içinde, ürün kullanılmamış ve orijinal ambalajındaysa ücretsiz iade edebilirsin. Koşulların tamamı <a href=\"/iptal-ve-iade\">İptal ve iade</a> sayfasında."),
+        ("Ürün değerlendirmesini nasıl yazarım?", "Giriş yaptıktan sonra ürün sayfasındaki <strong>Değerlendirmeler</strong> sekmesinden 1–5 arası puan verip yorum yazabilirsin. Ürünü satın aldıysan yorumunda “Satın aldı” rozeti görünür."),
+        ("Adres bilgilerimi nasıl değiştiririm?", "Menüdeki <strong>Ayarlar</strong> sayfasından adres ekleyebilir, düzenleyebilir ve varsayılan adresini seçebilirsin. Ödeme sırasında kayıtlı adreslerinden birini seçmen yeterli.")
+    };
+}
+<div class="accordion faq" id="faq">
+    @for (var i = 0; i < faqs.Length; i++)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(i == 0 ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#faq@(i)" aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="faq@(i)">@faqs[i].Q</button>
+            </h2>
+            <div id="faq@(i)" class="accordion-collapse collapse @(i == 0 ? "show" : "")" data-bs-parent="#faq">
+                <div class="accordion-body">@Html.Raw(faqs[i].A)</div>
+            </div>
+        </div>
+    }
+</div>
+<p class="small text-muted mt-4 mb-0">Aradığın cevabı bulamadın mı? <a asp-controller="Contact" asp-action="Index">Bize yaz</a>.</p>

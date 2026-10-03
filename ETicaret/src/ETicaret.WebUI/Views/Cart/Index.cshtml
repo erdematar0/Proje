@@ -1,0 +1,42 @@
+@model Cart
+@{ ViewData["Title"] = "Sepetim"; }
+<h1 class="h4 mb-4">Sepetim</h1>
+@if (!Model.Items.Any())
+{
+    <div class="empty-state">Sepetin boş. <a asp-controller="Home" asp-action="Index">Alışverişe başla</a></div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            @foreach (var item in Model.Items)
+            {
+                <div class="cart-row">
+                    <img src="@item.ImageUrl" alt="" />
+                    <div class="flex-grow-1">
+                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId" class="fw-semibold">@item.Name</a>
+                        <div class="text-muted small">@item.UnitPrice.ToTL() / adet</div>
+                    </div>
+                    <form asp-action="Update" method="post" class="d-flex gap-1">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <input type="number" name="quantity" value="@item.Quantity" min="0" class="form-control form-control-sm" style="width:70px" onchange="this.form.submit()" />
+                    </form>
+                    <strong class="line-total">@item.LineTotal.ToTL()</strong>
+                    <form asp-action="Remove" method="post">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <button class="btn btn-sm btn-link text-danger" title="Kaldır"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                </div>
+            }
+        </div>
+        <div class="col-lg-4">
+            <div class="summary-box">
+                <div class="d-flex justify-content-between"><span>Ara toplam</span><span>@Model.Total.ToTL()</span></div>
+                <div class="d-flex justify-content-between text-muted small my-2"><span>Kargo</span><span>Ücretsiz</span></div>
+                <hr />
+                <div class="d-flex justify-content-between fs-5 fw-semibold mb-3"><span>Toplam</span><span>@Model.Total.ToTL()</span></div>
+                <a asp-controller="Order" asp-action="Checkout" class="btn btn-accent w-100">Ödemeye geç</a>
+            </div>
+        </div>
+    </div>
+}

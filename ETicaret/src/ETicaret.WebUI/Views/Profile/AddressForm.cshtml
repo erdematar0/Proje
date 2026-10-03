@@ -1,0 +1,21 @@
+@model AddressSaveDto
+@{
+    int? id = ViewBag.Id;
+    ViewData["Title"] = id is null ? "Yeni adres" : "Adresi düzenle";
+}
+<h1 class="h4 mb-3">Hesabım</h1>
+<partial name="_ProfileNav" />
+<form asp-action="@(id is null ? "CreateAddress" : "EditAddress")" asp-route-id="@id" method="post" class="panel" style="max-width:640px">
+    <h2 class="h6 mb-3">@ViewData["Title"]</h2>
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+    <div class="row g-3">
+        <div class="col-md-4"><label asp-for="Title" class="form-label">Başlık</label><input asp-for="Title" class="form-control" placeholder="Ev, İş…" /><span asp-validation-for="Title" class="text-danger small"></span></div>
+        <div class="col-md-8"><label asp-for="FullName" class="form-label">Ad Soyad</label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
+        <div class="col-md-4"><label asp-for="Phone" class="form-label">Telefon</label><input asp-for="Phone" class="form-control" placeholder="05xx xxx xx xx" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
+        <div class="col-md-4"><label asp-for="City" class="form-label">Şehir</label><input asp-for="City" class="form-control" /><span asp-validation-for="City" class="text-danger small"></span></div>
+        <div class="col-md-4"><label asp-for="District" class="form-label">İlçe <span class="text-muted small">(opsiyonel)</span></label><input asp-for="District" class="form-control" /><span asp-validation-for="District" class="text-danger small"></span></div>
+        <div class="col-12"><label asp-for="AddressLine" class="form-label">Adres</label><textarea asp-for="AddressLine" class="form-control" rows="2" placeholder="Mahalle, sokak, bina ve daire no"></textarea><span asp-validation-for="AddressLine" class="text-danger small"></span></div>
+        <div class="col-12"><div class="form-check"><input asp-for="IsDefault" class="form-check-input" /><label asp-for="IsDefault" class="form-check-label">Varsayılan adresim olsun</label></div></div>
+    </div>
+    <div class="mt-4 d-flex gap-2"><button class="btn btn-accent">Kaydet</button><a asp-action="Addresses" class="btn btn-link">Vazgeç</a></div>
+</form>

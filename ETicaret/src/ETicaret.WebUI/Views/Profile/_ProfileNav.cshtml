@@ -1,0 +1,10 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(params string[] actions) => actions.Contains(action) ? "active" : "";
+}
+<nav class="nav nav-pills profile-nav mb-4">
+    <a class="nav-link @Active("Index")" asp-controller="Profile" asp-action="Index"><i class="bi bi-person"></i> Profil</a>
+    <a class="nav-link @Active("Addresses", "CreateAddress", "EditAddress")" asp-controller="Profile" asp-action="Addresses"><i class="bi bi-geo-alt"></i> Adreslerim</a>
+    <a class="nav-link @Active("ChangePassword")" asp-controller="Profile" asp-action="ChangePassword"><i class="bi bi-shield-lock"></i> Şifre</a>
+    <a class="nav-link" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-receipt"></i> Siparişlerim</a>
+</nav>

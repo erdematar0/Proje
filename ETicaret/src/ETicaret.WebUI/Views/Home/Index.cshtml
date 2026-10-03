@@ -1,0 +1,146 @@
+@model HomeIndexViewModel
+@{
+    ViewData["Title"] = "Vitrin";
+    var f = Model.Filter;
+    object RouteFor(int page) => new { f.Search, f.CategoryId, f.MinPrice, f.MaxPrice, f.SortBy, Page = page };
+    object CategoryRoute(int? categoryId) => new { f.Search, CategoryId = categoryId, f.MinPrice, f.MaxPrice, f.SortBy };
+    var activeFilters = (f.MinPrice is null ? 0 : 1) + (f.MaxPrice is null ? 0 : 1) + (string.IsNullOrEmpty(f.SortBy) ? 0 : 1);
+}
+
+<nav class="cat-bar mb-4" aria-label="Kategoriler">
+    <a href="@Url.Action("Index", CategoryRoute(null))" class="cat-chip @(f.CategoryId is null ? "active" : "")">Tümü</a>
+    @foreach (var c in Model.Categories)
+    {
+        <a href="@Url.Action("Index", CategoryRoute(c.Id))" class="cat-chip @(f.CategoryId == c.Id ? "active" : "")">
+            @c.Name <span class="count">@c.ProductCount</span>
+        </a>
+    }
+</nav>
+
+@if (Model.Featured.Any())
+{
+    <section class="featured mb-4" aria-label="Önerilenler">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 m-0"><i class="bi bi-stars text-accent me-1"></i> Önerilenler</h2>
+            <div class="carousel-indicators featured-dots position-static m-0">
+                @for (var i = 0; i < Model.Featured.Count; i++)
+                {
+                    <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : null)" aria-label="@(i + 1). öneri"></button>
+                }
+            </div>
+        </div>
+        <div id="featuredCarousel" class="carousel slide featured-carousel" data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="hover">
+            <div class="carousel-inner">
+                @for (var i = 0; i < Model.Featured.Count; i++)
+                {
+                    var p = Model.Featured[i];
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="featured-slide">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id" class="featured-img">
+                                <img src="@(p.ImageUrl ?? "https://picsum.photos/seed/placeholder/600/450")" alt="@p.Name" />
+                            </a>
+                            <div class="featured-info">
+                                <span class="featured-cat">@p.CategoryName</span>
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id" class="featured-name">@p.Name</a>
+                                @if (p.ReviewCount > 0)
+                                {
+                                    <div class="card-rating"><partial name="_Stars" model="p.AverageRating" /> <span>@p.AverageRating.ToString("0.0") (@p.ReviewCount değerlendirme)</span></div>
+                                }
+                                <p class="text-muted mb-0 d-none d-md-block">@p.Description</p>
+                                <div class="d-flex align-items-center gap-3 mt-2">
+                                    <span class="price fs-3">@p.Price.ToTL()</span>
+                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                        <input type="hidden" name="productId" value="@p.Id" />
+                                        <button class="btn btn-accent"><i class="bi bi-bag-plus"></i> Sepete ekle</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev" aria-label="Önceki"><i class="bi bi-chevron-left"></i></button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next" aria-label="Sonraki"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </section>
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+    <div>
+        <h1 class="h4 m-0">@(string.IsNullOrWhiteSpace(f.Search) ? "Tüm ürünler" : $"“{f.Search}” için sonuçlar")</h1>
+        <small class="text-muted">@Model.Products.TotalCount ürün</small>
+    </div>
+    <button class="btn filter-toggle @(activeFilters > 0 ? "has-active" : "")" type="button" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
+        <i class="bi bi-sliders2"></i> Filtre
+        @if (activeFilters > 0) { <span class="badge rounded-pill cart-badge ms-1">@activeFilters</span> }
+    </button>
+</div>
+
+<div class="collapse" id="filters">
+    <form method="get" class="filter-panel mb-4">
+        <input type="hidden" name="Search" value="@f.Search" />
+        <input type="hidden" name="CategoryId" value="@f.CategoryId" />
+        <div class="row g-3 align-items-end">
+            <div class="col-sm-6 col-lg-4">
+                <label class="form-label small text-muted">Fiyat aralığı</label>
+                <div class="d-flex gap-2">
+                    <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="MinPrice" placeholder="Min ₺" value="@f.MinPrice" />
+                    <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="MaxPrice" placeholder="Max ₺" value="@f.MaxPrice" />
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label class="form-label small text-muted">Sırala</label>
+                <select class="form-select form-select-sm" name="SortBy">
+                    <option value="" selected="@(f.SortBy is null)">En yeni</option>
+                    <option value="price_asc" selected="@(f.SortBy == "price_asc")">Fiyat: artan</option>
+                    <option value="price_desc" selected="@(f.SortBy == "price_desc")">Fiyat: azalan</option>
+                    <option value="rating" selected="@(f.SortBy == "rating")">En yüksek puan</option>
+                    <option value="name" selected="@(f.SortBy == "name")">İsim</option>
+                </select>
+            </div>
+            <div class="col-lg-5 d-flex gap-2 justify-content-lg-end">
+                <a href="@Url.Action("Index", new { f.Search, f.CategoryId })" class="btn btn-link btn-sm">Temizle</a>
+                <button class="btn btn-ink btn-sm px-4">Uygula</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Products.Items.Any())
+{
+    <div class="empty-state">Bu kriterlere uyan ürün bulunamadı.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
+        @foreach (var p in Model.Products.Items)
+        {
+            <div class="col"><partial name="_ProductCard" model="p" /></div>
+        }
+    </div>
+}
+
+@if (Model.Products.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (var i = 1; i <= Model.Products.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Products.Page ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", RouteFor(i))">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('featuredCarousel')?.addEventListener('slide.bs.carousel', e => {
+            document.querySelectorAll('.featured-dots [data-bs-slide-to]').forEach((dot, i) => {
+                dot.classList.toggle('active', i === e.to);
+                if (i === e.to) dot.setAttribute('aria-current', 'true'); else dot.removeAttribute('aria-current');
+            });
+        });
+    </script>
+}

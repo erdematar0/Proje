@@ -1,0 +1,59 @@
+@host = https://localhost:7101
+
+###
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@eticaret.com", "password": "Admin123!" }
+
+###
+@token = {{login.response.body.token}}
+
+###
+GET {{host}}/api/auth/me
+Authorization: Bearer {{token}}
+
+###
+GET {{host}}/api/products?sortBy=price_asc
+###
+GET {{host}}/api/products/1
+###
+GET {{host}}/api/categories
+
+###
+POST {{host}}/api/products
+Content-Type: application/json
+
+{ "name": "Yetkisiz", "price": 10, "stock": 1, "categoryId": 1 }
+
+###
+POST {{host}}/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "name": "", "price": 0, "stock": -1, "categoryId": 999 }
+
+###
+POST {{host}}/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Bluetooth Hoparlör",
+  "description": "Taşınabilir, suya dayanıklı",
+  "price": 899.90,
+  "stock": 20,
+  "imageUrl": "https://picsum.photos/seed/hoparlor/600/450",
+  "categoryId": 1,
+  "isActive": true
+}
+###
+PUT {{host}}/api/products/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "name": "Kablosuz Kulaklık Pro", "price": 2099.90, "stock": 20, "categoryId": 1, "isActive": true }
+###
+DELETE {{host}}/api/products/8
+Authorization: Bearer {{token}}

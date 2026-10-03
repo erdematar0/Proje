@@ -1,0 +1,33 @@
+@model AdminUserEditViewModel
+@{ ViewData["Title"] = "Kullanıcıyı düzenle"; }
+<nav class="small mb-3"><a asp-action="Index">Kullanıcılar</a> / <a asp-action="Detail" asp-route-id="@Model.Id">@Model.FirstName @Model.LastName</a> / Düzenle</nav>
+<form asp-action="Edit" method="post" class="panel" style="max-width:640px">
+    <input type="hidden" asp-for="Id" />
+    <h1 class="h5 mb-3">@ViewData["Title"]</h1>
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+    <div class="row g-3">
+        <div class="col-md-6"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger small"></span></div>
+        <div class="col-md-6"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger small"></span></div>
+        <div class="col-md-7">
+            <label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" type="email" />
+            <div class="form-text">Kullanıcı bu adresle giriş yapar.</div>
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+        <div class="col-md-5"><label asp-for="PhoneNumber" class="form-label"></label><input asp-for="PhoneNumber" class="form-control" placeholder="05xx xxx xx xx" /><span asp-validation-for="PhoneNumber" class="text-danger small"></span></div>
+        <div class="col-12"><div class="form-check"><input asp-for="EmailConfirmed" class="form-check-input" /><label asp-for="EmailConfirmed" class="form-check-label"></label></div></div>
+    </div>
+
+    <h2 class="h6 mt-4 mb-3">Yetki ve güvenlik</h2>
+    <div class="form-check form-switch mb-1"><input asp-for="IsAdmin" class="form-check-input" role="switch" /><label asp-for="IsAdmin" class="form-check-label"></label></div>
+    <span asp-validation-for="IsAdmin" class="text-danger small d-block mb-2"></span>
+    <div class="form-check form-switch mb-1"><input asp-for="IsLocked" class="form-check-input" role="switch" /><label asp-for="IsLocked" class="form-check-label"></label></div>
+    <span asp-validation-for="IsLocked" class="text-danger small d-block mb-3"></span>
+
+    <label asp-for="NewPassword" class="form-label"></label>
+    <input asp-for="NewPassword" class="form-control" autocomplete="new-password" />
+    <div class="form-text">Değiştirmek istemiyorsan boş bırak. En az 6 karakter; büyük harf, küçük harf ve rakam içermeli, aynı karakter art arda 3 kez kullanılamaz.</div>
+    <span asp-validation-for="NewPassword" class="text-danger small"></span>
+
+    <div class="mt-4 d-flex gap-2"><button class="btn btn-accent">Kaydet</button><a asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-link">Vazgeç</a></div>
+</form>

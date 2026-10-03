@@ -1,0 +1,35 @@
+@model List<AddressDto>
+@{ ViewData["Title"] = "Adreslerim"; }
+<h1 class="h4 mb-3">Hesabım</h1>
+<partial name="_ProfileNav" />
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="text-muted small">Ödeme sayfasında kayıtlı adreslerinden seçim yapabilirsin.</span>
+    <a asp-action="CreateAddress" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i> Yeni adres</a>
+</div>
+@if (!Model.Any())
+{
+    <div class="empty-state">Henüz kayıtlı adresin yok.</div>
+}
+<div class="row g-3">
+    @foreach (var a in Model)
+    {
+        <div class="col-md-6">
+            <div class="address-card h-100 d-flex flex-column @(a.IsDefault ? "is-default" : "")">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>@a.Title</strong>
+                    @if (a.IsDefault) { <span class="badge rounded-pill cart-badge">Varsayılan</span> }
+                </div>
+                <div class="small">@a.FullName · @a.Phone</div>
+                <div class="small text-muted flex-grow-1">@a.AddressLine<br />@(a.District is null ? a.City : $"{a.District} / {a.City}")</div>
+                <div class="d-flex gap-1 mt-3">
+                    <a asp-action="EditAddress" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                    @if (!a.IsDefault)
+                    {
+                        <form asp-action="SetDefaultAddress" asp-route-id="@a.Id" method="post"><button class="btn btn-sm btn-outline-secondary">Varsayılan yap</button></form>
+                    }
+                    <form asp-action="DeleteAddress" asp-route-id="@a.Id" method="post" class="ms-auto" onsubmit="return confirm('Adres silinsin mi?')"><button class="btn btn-sm btn-outline-danger">Sil</button></form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

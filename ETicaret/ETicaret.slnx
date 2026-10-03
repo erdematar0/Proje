@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ETicaret.Entities/ETicaret.Entities.csproj" />
+    <Project Path="src/ETicaret.DataAccess/ETicaret.DataAccess.csproj" />
+    <Project Path="src/ETicaret.Business/ETicaret.Business.csproj" />
+    <Project Path="src/ETicaret.WebUI/ETicaret.WebUI.csproj" />
+    <Project Path="src/ETicaret.API/ETicaret.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ETicaret.Tests/ETicaret.Tests.csproj" />
+  </Folder>
+</Solution>

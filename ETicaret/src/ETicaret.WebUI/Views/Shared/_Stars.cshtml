@@ -1,0 +1,4 @@
+@model double
+@{ var rounded = Math.Round(Model * 2, MidpointRounding.AwayFromZero) / 2; }
+<span class="stars" title="5 üzerinden @Model.ToString("0.0")" aria-label="5 üzerinden @Model.ToString("0.0") puan">@for (var i = 1; i <= 5; i++)
+{<i class="bi @(rounded >= i ? "bi-star-fill" : rounded >= i - 0.5 ? "bi-star-half" : "bi-star")"></i>}</span>

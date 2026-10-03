@@ -1,0 +1,12 @@
+@model OrderStatus
+@{
+    var (text, css) = Model switch
+    {
+        OrderStatus.Pending => ("Beklemede", "text-bg-warning"),
+        OrderStatus.Paid => ("Ödendi", "text-bg-info"),
+        OrderStatus.Shipped => ("Kargoda", "text-bg-primary"),
+        OrderStatus.Delivered => ("Teslim edildi", "text-bg-success"),
+        _ => ("İptal", "text-bg-secondary")
+    };
+}
+<span class="badge @css">@text</span>

@@ -1,0 +1,17 @@
+@model OrderDto
+@{
+    var statuses = new (OrderStatus, string)[]
+    {
+        (OrderStatus.Pending, "Beklemede"), (OrderStatus.Paid, "Ödendi"), (OrderStatus.Shipped, "Kargoda"),
+        (OrderStatus.Delivered, "Teslim edildi"), (OrderStatus.Cancelled, "İptal")
+    };
+}
+<form asp-controller="Orders" asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+        @foreach (var (value, label) in statuses)
+        {
+            <option value="@((int)value)" selected="@(value == Model.Status)">@label</option>
+        }
+    </select>
+</form>

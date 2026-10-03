@@ -1,0 +1,74 @@
+@model UserDetailDto
+@{
+    var u = Model.User;
+    ViewData["Title"] = u.FullName;
+}
+<nav class="small mb-3"><a asp-action="Index">Kullanıcılar</a> / @u.FullName</nav>
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="panel mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <h1 class="h5 mb-1">@u.FullName</h1>
+                <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-ink"><i class="bi bi-pencil"></i> Düzenle</a>
+            </div>
+            <div class="mb-3">
+                @foreach (var r in u.Roles) { <span class="badge @(r == "Admin" ? "text-bg-dark" : "text-bg-light border") me-1">@(r == "Admin" ? "Admin" : "Müşteri")</span> }
+                @if (u.IsLockedOut) { <span class="badge text-bg-danger">Kilitli</span> }
+            </div>
+            <div class="small mb-1"><i class="bi bi-envelope me-2"></i><a href="mailto:@u.Email">@u.Email</a></div>
+            <div class="small mb-3"><i class="bi bi-telephone me-2"></i>@(u.Phone ?? "—")</div>
+            <div class="row g-2 text-center">
+                <div class="col"><div class="stat p-2"><span>Sipariş</span><strong class="fs-5">@u.OrderCount</strong></div></div>
+                <div class="col"><div class="stat p-2"><span>Harcama</span><strong class="fs-5">@u.TotalSpent.ToTL()</strong></div></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h6 m-0">Adresler</h2>
+                <a asp-action="CreateAddress" asp-route-userId="@u.Id" class="small"><i class="bi bi-plus-lg"></i> Adres ekle</a>
+            </div>
+            @if (!Model.Addresses.Any()) { <p class="text-muted small mb-0">Kayıtlı adres yok.</p> }
+            @foreach (var a in Model.Addresses)
+            {
+                <div class="small border-bottom py-2">
+                    <strong>@a.Title</strong> @if (a.IsDefault) { <span class="badge rounded-pill cart-badge">Varsayılan</span> }
+                    <div>@a.FullName · @a.Phone</div>
+                    <div class="text-muted">@a.AddressLine, @(a.District is null ? a.City : $"{a.District} / {a.City}")</div>
+                    <div class="d-flex gap-3 mt-1">
+                        <a asp-action="EditAddress" asp-route-userId="@u.Id" asp-route-addressId="@a.Id">Düzenle</a>
+                        @if (!a.IsDefault)
+                        {
+                            <form asp-action="SetDefaultAddress" asp-route-userId="@u.Id" asp-route-addressId="@a.Id" method="post">
+                                <button class="btn btn-link btn-sm p-0 small">Varsayılan yap</button>
+                            </form>
+                        }
+                        <form asp-action="DeleteAddress" asp-route-userId="@u.Id" asp-route-addressId="@a.Id" method="post" onsubmit="return confirm('Bu adres silinsin mi?')">
+                            <button class="btn btn-link btn-sm p-0 small text-danger">Sil</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="panel p-0">
+            <h2 class="h6 p-3 pb-0">Siparişler</h2>
+            <table class="table align-middle mb-0">
+                <thead><tr><th>No</th><th>Tarih</th><th>Teslimat</th><th class="text-end">Tutar</th><th style="width:160px">Durum</th></tr></thead>
+                <tbody>
+                @foreach (var o in Model.Orders)
+                {
+                    <tr>
+                        <td>@o.OrderNumber<div class="small text-muted">@(string.Join(", ", o.Items.Select(i => $"{i.ProductName}×{i.Quantity}")))</div></td>
+                        <td class="small">@o.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                        <td class="small">@o.FullName<div class="text-muted">@o.City</div></td>
+                        <td class="text-end">@o.TotalPrice.ToTL()</td>
+                        <td><partial name="_OrderStatusForm" model="o" /></td>
+                    </tr>
+                }
+                @if (!Model.Orders.Any()) { <tr><td colspan="5" class="text-muted">Henüz sipariş yok.</td></tr> }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

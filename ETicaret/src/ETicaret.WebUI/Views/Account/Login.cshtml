@@ -1,0 +1,22 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Giriş"; }
+<div class="auth-box">
+    <h1 class="h4 mb-4">Giriş yap</h1>
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <div class="password-field">
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                <button type="button" class="password-toggle" aria-label="Şifreyi göster" aria-pressed="false" title="Şifreyi göster"><i class="bi bi-eye"></i></button>
+            </div>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+        <div class="form-check mb-3"><input asp-for="RememberMe" class="form-check-input" /><label asp-for="RememberMe" class="form-check-label"></label></div>
+        <button class="btn btn-ink w-100">Giriş yap</button>
+    </form>
+    <p class="small mt-3 mb-0">Hesabın yok mu? <a asp-action="Register">Üye ol</a></p>
+</div>
+@section Scripts { <partial name="_ValidationScripts" /> }

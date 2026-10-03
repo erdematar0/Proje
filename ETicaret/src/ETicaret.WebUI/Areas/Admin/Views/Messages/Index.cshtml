@@ -1,0 +1,36 @@
+@model List<ContactMessageDto>
+@{
+    ViewData["Title"] = "Mesajlar";
+    var current = (ContactMessageStatus?)ViewBag.Status;
+    var tabs = new (ContactMessageStatus?, string)[]
+    {
+        (null, "Tümü"), (ContactMessageStatus.New, "Yeni"), (ContactMessageStatus.Read, "Okundu"), (ContactMessageStatus.Replied, "Yanıtlandı")
+    };
+}
+<h1 class="h4 mb-3">Mesajlar</h1>
+<nav class="nav nav-pills profile-nav mb-3">
+    @foreach (var (status, label) in tabs)
+    {
+        <a class="nav-link @(status == current ? "active" : "")" asp-action="Index" asp-route-status="@status">@label</a>
+    }
+</nav>
+<div class="panel p-0">
+<table class="table align-middle mb-0">
+    <thead><tr><th>Gönderen</th><th>Konu</th><th>Tarih</th><th>Durum</th></tr></thead>
+    <tbody>
+    @foreach (var m in Model)
+    {
+        <tr class="@(m.Status == ContactMessageStatus.New ? "fw-semibold" : "")">
+            <td>@m.Name<div class="small text-muted fw-normal">@m.Email</div></td>
+            <td>
+                <a asp-action="Detail" asp-route-id="@m.Id">@m.Subject</a>
+                <div class="small text-muted fw-normal text-truncate" style="max-width:420px">@m.Message</div>
+            </td>
+            <td class="small fw-normal">@m.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+            <td><partial name="_MessageStatusBadge" model="m.Status" /></td>
+        </tr>
+    }
+    @if (!Model.Any()) { <tr><td colspan="4" class="text-muted">Mesaj yok.</td></tr> }
+    </tbody>
+</table>
+</div>

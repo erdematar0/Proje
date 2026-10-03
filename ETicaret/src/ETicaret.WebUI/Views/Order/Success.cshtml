@@ -1,0 +1,8 @@
+@model string
+@{ ViewData["Title"] = "Sipariş alındı"; }
+<div class="empty-state">
+    <i class="bi bi-check-circle fs-1 text-success"></i>
+    <h1 class="h4 mt-2">Siparişin alındı</h1>
+    <p>Sipariş numaran: <strong>@Model</strong></p>
+    <a asp-action="MyOrders" class="btn btn-ink btn-sm">Siparişlerim</a>
+</div>

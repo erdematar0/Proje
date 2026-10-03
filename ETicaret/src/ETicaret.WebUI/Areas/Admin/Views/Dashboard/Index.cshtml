@@ -1,0 +1,39 @@
+@model List<OrderDto>
+@{
+    ViewData["Title"] = "Genel bakış";
+    var lowStock = (List<ProductDto>)ViewBag.LowStock;
+}
+<h1 class="h4 mb-4">Genel bakış</h1>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><div class="stat"><span>Ciro</span><strong>@(((decimal)ViewBag.Revenue).ToTL())</strong></div></div>
+    <div class="col-6 col-xl-3"><div class="stat"><span>Sipariş</span><strong>@ViewBag.OrderCount</strong></div></div>
+    <div class="col-6 col-xl-3"><div class="stat"><span>Aktif ürün</span><strong>@ViewBag.ProductCount</strong></div></div>
+    <div class="col-6 col-xl-3"><div class="stat"><span>Kategori</span><strong>@ViewBag.CategoryCount</strong></div></div>
+</div>
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="panel">
+            <h2 class="h6">Son siparişler</h2>
+            <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>No</th><th>Müşteri</th><th>Tarih</th><th>Durum</th><th class="text-end">Tutar</th></tr></thead>
+                <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr><td>@o.OrderNumber</td><td>@o.FullName</td><td>@o.CreatedDate.ToLocalTime().ToString("dd.MM HH:mm")</td><td><partial name="_StatusBadge" model="o.Status" /></td><td class="text-end">@o.TotalPrice.ToTL()</td></tr>
+                }
+                @if (!Model.Any()) { <tr><td colspan="5" class="text-muted">Henüz sipariş yok.</td></tr> }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="panel">
+            <h2 class="h6">Stoğu azalanlar</h2>
+            @if (!lowStock.Any()) { <p class="text-muted small mb-0">Stok durumu iyi.</p> }
+            @foreach (var p in lowStock)
+            {
+                <div class="d-flex justify-content-between small py-1 border-bottom"><a asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id">@p.Name</a><span class="text-danger">@p.Stock</span></div>
+            }
+        </div>
+    </div>
+</div>

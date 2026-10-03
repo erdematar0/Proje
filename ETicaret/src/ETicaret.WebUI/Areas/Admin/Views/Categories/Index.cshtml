@@ -1,0 +1,32 @@
+@model List<CategoryDto>
+@{ ViewData["Title"] = "Kategoriler"; }
+<h1 class="h4 mb-3">Kategoriler</h1>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="panel p-0">
+        <table class="table align-middle mb-0">
+            <thead><tr><th>Ad</th><th>Açıklama</th><th class="text-end">Ürün</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.Name</td><td class="small text-muted">@c.Description</td><td class="text-end">@c.ProductCount</td>
+                    <td class="text-end text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                        <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Silinsin mi?')"><button class="btn btn-sm btn-outline-danger">Sil</button></form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <form asp-action="Create" method="post" class="panel">
+            <h2 class="h6 mb-3">Yeni kategori</h2>
+            <input name="Name" class="form-control mb-2" placeholder="Ad" required />
+            <textarea name="Description" class="form-control mb-3" rows="2" placeholder="Açıklama (opsiyonel)"></textarea>
+            <button class="btn btn-accent btn-sm">Ekle</button>
+        </form>
+    </div>
+</div>

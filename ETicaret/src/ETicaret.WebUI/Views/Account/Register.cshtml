@@ -1,0 +1,18 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Üye ol"; }
+<div class="auth-box">
+    <h1 class="h4 mb-4">Üye ol</h1>
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+        <div class="row g-2 mb-3">
+            <div class="col"><label asp-for="FirstName" class="form-label"></label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger small"></span></div>
+            <div class="col"><label asp-for="LastName" class="form-label"></label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger small"></span></div>
+        </div>
+        <div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+        <div class="mb-3"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" /><span asp-validation-for="Password" class="text-danger small"></span><div class="form-text">En az 6 karakter; büyük harf, küçük harf ve rakam içermeli. Aynı karakter art arda 3 kez kullanılamaz.</div></div>
+        <div class="mb-3"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" /><span asp-validation-for="ConfirmPassword" class="text-danger small"></span></div>
+        <button class="btn btn-accent w-100">Hesap oluştur</button>
+    </form>
+    <p class="small mt-3 mb-0">Zaten üye misin? <a asp-action="Login">Giriş yap</a></p>
+</div>
+@section Scripts { <partial name="_ValidationScripts" /> }

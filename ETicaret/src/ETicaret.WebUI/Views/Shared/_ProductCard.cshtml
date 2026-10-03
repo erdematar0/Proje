@@ -1,0 +1,26 @@
+@model ProductDto
+<div class="product-card h-100">
+    <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.Id" class="thumb">
+        <img src="@(Model.ImageUrl ?? "https://picsum.photos/seed/placeholder/600/450")" alt="@Model.Name" loading="lazy" />
+    </a>
+    <div class="p-3 d-flex flex-column gap-1 flex-grow-1">
+        <small class="text-muted">@Model.CategoryName</small>
+        <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.Id" class="name">@Model.Name</a>
+        @if (Model.ReviewCount > 0)
+        {
+            <div class="card-rating"><partial name="_Stars" model="Model.AverageRating" /> <span>@Model.AverageRating.ToString("0.0") (@Model.ReviewCount)</span></div>
+        }
+        <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+            <span class="price">@Model.Price.ToTL()</span>
+            @if (Model.Stock > 0)
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <button class="btn btn-sm btn-ink"><i class="bi bi-plus-lg"></i> Sepete</button>
+                </form>
+            }
+            else { <span class="badge text-bg-secondary">Tükendi</span> }
+        </div>
+    </div>
+</div>

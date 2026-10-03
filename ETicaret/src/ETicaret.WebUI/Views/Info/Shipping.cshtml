@@ -1,0 +1,22 @@
+@{ ViewData["Title"] = "Kargo ve teslimat"; }
+<div class="row g-3 mb-4">
+    <div class="col-sm-4"><div class="info-stat"><strong>Ücretsiz</strong><span>Tüm siparişlerde kargo</span></div></div>
+    <div class="col-sm-4"><div class="info-stat"><strong>1–3 iş günü</strong><span>Kargoya teslim süresi</span></div></div>
+    <div class="col-sm-4"><div class="info-stat"><strong>Türkiye geneli</strong><span>81 ile teslimat</span></div></div>
+</div>
+
+<h2 class="h6">Siparişim ne zaman kargoya verilir?</h2>
+<p>Ödemesi onaylanan siparişler, hafta içi 1–3 iş günü içinde hazırlanıp anlaşmalı kargo firmasına teslim edilir. Hafta sonu ve resmî tatillerde verilen siparişler ilk iş gününde işleme alınır.</p>
+
+<h2 class="h6">Teslimat ne kadar sürer?</h2>
+<p>Kargoya verilen siparişler bulunduğun şehre göre genellikle 1–3 iş günü içinde teslim edilir. Hava koşulları veya yoğun dönemler (kampanya günleri gibi) süreyi uzatabilir.</p>
+
+<h2 class="h6">Siparişimi nasıl takip ederim?</h2>
+<p>Sipariş durumunu <a asp-controller="Order" asp-action="MyOrders">Siparişlerim</a> sayfasından takip edebilirsin: <em>Ödendi</em> → <em>Kargoda</em> → <em>Teslim edildi</em>.</p>
+
+<h2 class="h6">Teslimatta nelere dikkat etmeliyim?</h2>
+<ul class="policy-list mb-0">
+    <li>Paketi teslim alırken kargo görevlisinin yanında kontrol et; hasarlı pakette tutanak tutturarak teslim almayabilirsin.</li>
+    <li>Adreste bulunamazsan kargo firması bildirim bırakır; paketini şubeden teslim alabilirsin.</li>
+    <li>Adresini sipariş vermeden önce <a asp-controller="Profile" asp-action="Addresses">adres defterinden</a> kontrol etmeni öneririz.</li>
+</ul>

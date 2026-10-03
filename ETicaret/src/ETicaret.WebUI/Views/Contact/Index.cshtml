@@ -1,0 +1,32 @@
+@model ContactMessageSaveDto
+@{ ViewData["Title"] = "Bize ulaşın"; }
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-7">
+        <h1 class="h4 mb-1">Bize ulaşın</h1>
+        <p class="text-muted mb-4">Soru, öneri ve şikayetlerini buradan iletebilirsin. En kısa sürede e-posta ile dönüş yapıyoruz.</p>
+        <form asp-action="Index" method="post" class="panel">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+            <div class="row g-3">
+                <div class="col-md-6"><label asp-for="Name" class="form-label">Ad Soyad</label><input asp-for="Name" class="form-control" autocomplete="name" /><span asp-validation-for="Name" class="text-danger small"></span></div>
+                <div class="col-md-6"><label asp-for="Email" class="form-label">E-posta</label><input asp-for="Email" class="form-control" type="email" autocomplete="email" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+                <div class="col-md-6"><label asp-for="Phone" class="form-label">Telefon <span class="text-muted small">(opsiyonel)</span></label><input asp-for="Phone" class="form-control" autocomplete="tel" placeholder="05xx xxx xx xx" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
+                <div class="col-md-6">
+                    <label asp-for="Subject" class="form-label">Konu</label>
+                    <select asp-for="Subject" class="form-select" asp-items="@(new Microsoft.AspNetCore.Mvc.Rendering.SelectList(ETicaret.WebUI.Controllers.ContactController.Subjects))"><option value="">Seçin…</option></select>
+                    <span asp-validation-for="Subject" class="text-danger small"></span>
+                </div>
+                <div class="col-12"><label asp-for="Message" class="form-label">Mesajın</label><textarea asp-for="Message" class="form-control" rows="6" maxlength="2000" placeholder="Sipariş numaran varsa eklemeyi unutma"></textarea><span asp-validation-for="Message" class="text-danger small"></span></div>
+
+                <div class="hp-field" aria-hidden="true"><label for="Website">Website</label><input asp-for="Website" tabindex="-1" autocomplete="off" /></div>
+            </div>
+            <button class="btn btn-accent mt-4"><i class="bi bi-send"></i> Gönder</button>
+        </form>
+    </div>
+    <div class="col-lg-4">
+        <div class="panel">
+            <h2 class="h6 mb-3">Yazmadan önce</h2>
+            <p class="small mb-2"><i class="bi bi-receipt me-2"></i>Siparişinle ilgiliyse sipariş numaranı (SP…) mesaja ekle.</p>
+            <p class="small text-muted mb-0">Sipariş durumunu <a asp-controller="Order" asp-action="MyOrders">Siparişlerim</a> sayfasından da takip edebilirsin.</p>
+        </div>
+    </div>
+</div>

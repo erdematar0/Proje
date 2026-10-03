@@ -1,0 +1,17 @@
+@model List<OrderDto>
+@{ ViewData["Title"] = "Siparişlerim"; }
+<h1 class="h4 mb-4">Siparişlerim</h1>
+@if (!Model.Any()) { <div class="empty-state">Henüz siparişin yok.</div> }
+@foreach (var o in Model)
+{
+    <div class="order-card mb-3">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div><strong>@o.OrderNumber</strong> <span class="text-muted small">· @o.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></div>
+            <partial name="_StatusBadge" model="o.Status" />
+        </div>
+        <ul class="small text-muted mb-1 mt-2 ps-3">
+            @foreach (var i in o.Items) { <li>@i.ProductName × @i.Quantity — @((i.UnitPrice * i.Quantity).ToTL())</li> }
+        </ul>
+        <div class="text-end fw-semibold">@o.TotalPrice.ToTL()</div>
+    </div>
+}

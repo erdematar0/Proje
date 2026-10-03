@@ -1,0 +1,41 @@
+@model ProductSaveDto
+<div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+<div class="row g-3">
+    <div class="col-md-8"><label asp-for="Name" class="form-label">Ad</label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger small"></span></div>
+    <div class="col-md-4"><label asp-for="CategoryId" class="form-label">Kategori</label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"><option value="0">Seçin…</option></select>
+        <span asp-validation-for="CategoryId" class="text-danger small"></span></div>
+    <div class="col-12"><label asp-for="Description" class="form-label">Açıklama</label><textarea asp-for="Description" class="form-control" rows="4"></textarea><span asp-validation-for="Description" class="text-danger small"></span></div>
+    <div class="col-12">
+        <label asp-for="Specifications" class="form-label">Özellikler</label>
+        <textarea asp-for="Specifications" class="form-control font-monospace small" rows="5" placeholder="Pil ömrü: 30 saat&#10;Ağırlık: 250 g&#10;Garanti: 2 yıl"></textarea>
+        <div class="form-text">Her satıra bir özellik, "Ad: Değer" biçiminde. Ürün sayfasında tablo olarak görünür.</div>
+        <span asp-validation-for="Specifications" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4"><label asp-for="Price" class="form-label">Fiyat (₺)</label><input asp-for="Price" class="form-control" type="number" step="0.01" /><span asp-validation-for="Price" class="text-danger small"></span></div>
+    <div class="col-md-4"><label asp-for="Stock" class="form-label">Stok</label><input asp-for="Stock" class="form-control" /><span asp-validation-for="Stock" class="text-danger small"></span></div>
+    <div class="col-md-4 d-flex align-items-end"><div class="form-check"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Yayında</label></div></div>
+
+    <div class="col-12">
+        <label class="form-label">Görsel</label>
+        <div class="d-flex gap-3 align-items-start">
+            <img id="imagePreview" src="@Model.ImageUrl" alt="" class="img-preview @(string.IsNullOrEmpty(Model.ImageUrl) ? "d-none" : "")" />
+            <div class="flex-grow-1">
+                <input type="file" name="imageFile" id="imageFile" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <div class="form-text">JPG, PNG veya WEBP · en fazla 2 MB. Dosya seçerseniz aşağıdaki URL'in yerine geçer.</div>
+                @Html.ValidationMessage("imageFile", null, new { @class = "text-danger small" })
+                <label asp-for="ImageUrl" class="form-label mt-2 small text-muted">veya görsel URL</label>
+                <input asp-for="ImageUrl" class="form-control form-control-sm" placeholder="https://…" />
+                <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('imageFile').addEventListener('change', e => {
+        const file = e.target.files[0], img = document.getElementById('imagePreview');
+        if (!file) return;
+        img.src = URL.createObjectURL(file);
+        img.classList.remove('d-none');
+    });
+</script>

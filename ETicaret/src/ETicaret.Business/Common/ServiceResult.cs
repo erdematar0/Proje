@@ -1,0 +1,27 @@
+namespace ETicaret.Business.Common;
+
+public class ServiceResult
+{
+    public bool Success { get; init; }
+    public string? Message { get; init; }
+
+    public static ServiceResult Ok(string? message = null) => new() { Success = true, Message = message };
+    public static ServiceResult Fail(string message) => new() { Success = false, Message = message };
+}
+
+public class ServiceResult<T> : ServiceResult
+{
+    public T? Data { get; init; }
+
+    public static ServiceResult<T> Ok(T data, string? message = null) => new() { Success = true, Data = data, Message = message };
+    public new static ServiceResult<T> Fail(string message) => new() { Success = false, Message = message };
+}
+
+public class PagedResult<T>
+{
+    public List<T> Items { get; init; } = new();
+    public int TotalCount { get; init; }
+    public int Page { get; init; }
+    public int PageSize { get; init; }
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+}

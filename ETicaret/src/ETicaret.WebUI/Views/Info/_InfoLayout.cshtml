@@ -1,0 +1,26 @@
+@{
+    Layout = "_Layout";
+    var current = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(string action) => current == action ? "active" : "";
+}
+<div class="row g-4">
+    <aside class="col-lg-3">
+        <nav class="info-nav">
+            <span class="info-nav-title">Kurumsal</span>
+            <a asp-controller="Info" asp-action="About" class="@Active("About")">Hakkımızda</a>
+            <a asp-controller="Contact" asp-action="Index">İletişim</a>
+            <a asp-controller="Info" asp-action="Privacy" class="@Active("Privacy")">Gizlilik politikası</a>
+            <a asp-controller="Info" asp-action="Terms" class="@Active("Terms")">Kullanım koşulları</a>
+            <span class="info-nav-title mt-3">Yardım</span>
+            <a asp-controller="Info" asp-action="Faq" class="@Active("Faq")">Sık sorulan sorular</a>
+            <a asp-controller="Info" asp-action="Shipping" class="@Active("Shipping")">Kargo ve teslimat</a>
+            <a asp-controller="Info" asp-action="Returns" class="@Active("Returns")">İptal ve iade</a>
+        </nav>
+    </aside>
+    <article class="col-lg-9">
+        <div class="panel info-page">
+            <h1 class="h3 mb-4">@ViewData["Title"]</h1>
+            @RenderBody()
+        </div>
+    </article>
+</div>

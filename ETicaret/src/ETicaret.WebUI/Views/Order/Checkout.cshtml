@@ -1,0 +1,83 @@
+@model CheckoutViewModel
+@{ ViewData["Title"] = "Ödeme"; }
+<h1 class="h4 mb-4">Ödeme</h1>
+<form asp-action="Checkout" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" style="display:@(ViewData.ModelState.ErrorCount > 0 ? "block" : "none")"></div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <section class="form-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h6 m-0">Teslimat bilgileri</h2>
+                    <a asp-controller="Profile" asp-action="Addresses" class="small">Adreslerimi yönet</a>
+                </div>
+                @if (Model.SavedAddresses.Any())
+                {
+                    <div class="mb-3">
+                        <label for="savedAddress" class="form-label">Kayıtlı adreslerim</label>
+                        <select id="savedAddress" class="form-select">
+                            <option value="">Seçin…</option>
+                            @foreach (var a in Model.SavedAddresses)
+                            {
+                                <option data-fullname="@a.FullName" data-address="@CheckoutViewModel.FormatAddress(a)" data-city="@a.City" data-phone="@a.Phone"
+                                        selected="@(a.IsDefault && Model.Address == CheckoutViewModel.FormatAddress(a))">@a.Title — @a.City</option>
+                            }
+                        </select>
+                    </div>
+                }
+                <div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control" /><span asp-validation-for="FullName" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="Address" class="form-label"></label><textarea asp-for="Address" class="form-control" rows="2"></textarea><span asp-validation-for="Address" class="text-danger small"></span></div>
+                <div class="row g-2">
+                    <div class="col"><label asp-for="City" class="form-label"></label><input asp-for="City" class="form-control" /><span asp-validation-for="City" class="text-danger small"></span></div>
+                    <div class="col"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control" placeholder="05xx xxx xx xx" /><span asp-validation-for="Phone" class="text-danger small"></span></div>
+                </div>
+            </section>
+            <section class="form-section mt-4">
+                <h2 class="h6 mb-3">Kart bilgileri <small class="text-muted fw-normal">(demo — test kartı: 4111 1111 1111 1111)</small></h2>
+                <div class="mb-3"><label asp-for="CardHolder" class="form-label"></label><input asp-for="CardHolder" class="form-control" autocomplete="cc-name" /><span asp-validation-for="CardHolder" class="text-danger small"></span></div>
+                <div class="mb-3"><label asp-for="CardNumber" class="form-label"></label><input asp-for="CardNumber" class="form-control" inputmode="numeric" autocomplete="cc-number" maxlength="19" placeholder="0000 0000 0000 0000" /><span asp-validation-for="CardNumber" class="text-danger small"></span></div>
+                <div class="row g-2">
+                    <div class="col"><label asp-for="Expiry" class="form-label"></label><input asp-for="Expiry" class="form-control" placeholder="AA/YY" maxlength="5" inputmode="numeric" autocomplete="cc-exp" /><span asp-validation-for="Expiry" class="text-danger small"></span></div>
+                    <div class="col"><label asp-for="Cvv" class="form-label"></label><input asp-for="Cvv" class="form-control" maxlength="4" inputmode="numeric" autocomplete="cc-csc" /><span asp-validation-for="Cvv" class="text-danger small"></span></div>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-5">
+            <div class="summary-box">
+                <h2 class="h6 mb-3">Sipariş özeti</h2>
+                @foreach (var i in Model.Cart!.Items)
+                {
+                    <div class="d-flex justify-content-between small mb-1"><span>@i.Name × @i.Quantity</span><span>@i.LineTotal.ToTL()</span></div>
+                }
+                <hr />
+                <div class="d-flex justify-content-between fs-5 fw-semibold mb-3"><span>Toplam</span><span>@Model.Cart.Total.ToTL()</span></div>
+                <button class="btn btn-accent w-100">Siparişi onayla</button>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    <partial name="_ValidationScripts" />
+    <script>
+        document.getElementById('CardNumber').addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+        });
+
+        document.getElementById('Expiry').addEventListener('input', e => {
+            let digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+            if (/^[2-9]$/.test(digits)) digits = '0' + digits;
+            const deleting = e.inputType?.startsWith('delete');
+            e.target.value = digits.length > 2 || (digits.length === 2 && !deleting)
+                ? digits.slice(0, 2) + '/' + digits.slice(2)
+                : digits;
+        });
+
+        document.getElementById('savedAddress')?.addEventListener('change', e => {
+            const o = e.target.selectedOptions[0];
+            if (!o.dataset.address) return;
+            document.getElementById('FullName').value = o.dataset.fullname;
+            document.getElementById('Address').value = o.dataset.address;
+            document.getElementById('City').value = o.dataset.city;
+            document.getElementById('Phone').value = o.dataset.phone;
+        });
+    </script>
+}

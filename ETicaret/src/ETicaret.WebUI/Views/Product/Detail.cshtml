@@ -1,0 +1,231 @@
+@model ProductDetailViewModel
+@{
+    var p = Model.Product;
+    var r = Model.Reviews;
+    ViewData["Title"] = p.Name;
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isAdmin = User.IsInRole("Admin");
+    var maxFree = Model.Installments.Where(i => i.IsInterestFree).Max(i => i.Months);
+    var longest = Model.Installments.MaxBy(i => i.Months)!;
+    var openTab = ViewData["OpenTab"] as string ?? "specs";
+    string TabActive(string tab) => tab == openTab ? "active" : "";
+}
+<nav class="small mb-3"><a asp-controller="Home" asp-action="Index">Vitrin</a> / <a asp-controller="Home" asp-action="Index" asp-route-CategoryId="@p.CategoryId">@p.CategoryName</a></nav>
+
+<div class="row g-5">
+    <div class="col-md-6"><img class="img-fluid rounded-4 w-100 product-hero" src="@p.ImageUrl" alt="@p.Name" /></div>
+    <div class="col-md-6">
+        <h1 class="h3 mb-2">@p.Name</h1>
+        @if (r.Count > 0)
+        {
+            <a href="#reviews" class="rating-link d-inline-flex align-items-center gap-2 mb-2" data-open-tab="reviews">
+                <partial name="_Stars" model="r.Average" />
+                <strong>@r.Average.ToString("0.0")</strong>
+                <span class="text-muted small">(@r.Count değerlendirme)</span>
+            </a>
+        }
+        else
+        {
+            <div class="text-muted small mb-2">Henüz değerlendirme yok</div>
+        }
+
+        <p class="price fs-2 my-3">@p.Price.ToTL()</p>
+        @if (longest.Months > 1)
+        {
+            <a href="#details" class="installment-teaser mb-3" data-open-tab="installments">
+                <i class="bi bi-credit-card"></i>
+                <span>
+                    @if (maxFree > 1) { <strong>@maxFree aya varan vade farksız taksit</strong> <span class="text-muted">·</span> }
+                    <span class="text-muted">@longest.Months ay × @longest.MonthlyAmount.ToTL()</span>
+                </span>
+            </a>
+        }
+
+        <p class="text-muted">@p.Description</p>
+        <p class="small">@(p.Stock > 0 ? $"Stokta {p.Stock} adet" : "Stokta yok")</p>
+        @if (p.Stock > 0)
+        {
+            <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex gap-2" style="max-width:320px">
+                <input type="hidden" name="productId" value="@p.Id" />
+                <input type="number" name="quantity" value="1" min="1" max="@p.Stock" class="form-control" style="width:90px" />
+                <button class="btn btn-accent flex-grow-1"><i class="bi bi-bag-plus"></i> Sepete ekle</button>
+            </form>
+        }
+
+        <div class="perks mt-4">
+            <div><i class="bi bi-truck"></i> 1–3 iş gününde kargoda</div>
+            <div><i class="bi bi-arrow-counterclockwise"></i> 14 gün içinde ücretsiz iade</div>
+            <div><i class="bi bi-shield-check"></i> Güvenli ödeme</div>
+        </div>
+    </div>
+</div>
+
+<section id="details" class="mt-5">
+    <ul class="nav detail-tabs" role="tablist">
+        <li class="nav-item"><button class="nav-link @TabActive("specs")" data-bs-toggle="tab" data-bs-target="#tab-specs" type="button" role="tab">Ürün özellikleri</button></li>
+        <li class="nav-item"><button class="nav-link @TabActive("installments")" data-bs-toggle="tab" data-bs-target="#tab-installments" type="button" role="tab">Taksit seçenekleri</button></li>
+        <li class="nav-item"><button class="nav-link @TabActive("reviews")" data-bs-toggle="tab" data-bs-target="#tab-reviews" type="button" role="tab">Değerlendirmeler <span class="tab-count">@r.Count</span></button></li>
+        <li class="nav-item"><button class="nav-link @TabActive("returns")" data-bs-toggle="tab" data-bs-target="#tab-returns" type="button" role="tab">İptal & iade</button></li>
+    </ul>
+
+    <div class="tab-content panel mt-3">
+        <div class="tab-pane fade @(openTab == "specs" ? "show active" : "")" id="tab-specs" role="tabpanel">
+            @if (Model.Specs.Any())
+            {
+                <table class="table spec-table mb-0">
+                    <tbody>
+                    @foreach (var s in Model.Specs)
+                    {
+                        <tr><th scope="row">@s.Name</th><td>@s.Value</td></tr>
+                    }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted mb-0">Bu ürün için özellik bilgisi girilmemiş.</p>
+            }
+        </div>
+
+        <div class="tab-pane fade @(openTab == "installments" ? "show active" : "")" id="tab-installments" role="tabpanel">
+            <table class="table align-middle mb-2">
+                <thead><tr><th>Taksit</th><th class="text-end">Aylık ödeme</th><th class="text-end">Toplam</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var i in Model.Installments)
+                {
+                    <tr>
+                        <td>@(i.Months == 1 ? "Tek çekim" : $"{i.Months} taksit")</td>
+                        <td class="text-end">@i.MonthlyAmount.ToTL()</td>
+                        <td class="text-end fw-semibold">@i.Total.ToTL()</td>
+                        <td class="text-end">
+                            @if (i.Months > 1 && i.IsInterestFree) { <span class="badge rounded-pill cart-badge">Vade farksız</span> }
+                            else if (!i.IsInterestFree) { <span class="small text-muted">%@((i.InterestRate * 100).ToString("0")) vade farkı</span> }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <p class="small text-muted mb-0">
+                Tüm kredi kartlarına geçerlidir. Aylık tutarı @Installments.MinMonthlyAmount.ToTL() altına düşen taksit seçenekleri gösterilmez.
+                Banka kartları ve ticari kartlarda taksit yapılamaz.
+            </p>
+        </div>
+
+        <div class="tab-pane fade @(openTab == "reviews" ? "show active" : "")" id="tab-reviews" role="tabpanel">
+            <span id="reviews"></span>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="rating-summary">
+                        @if (r.Count > 0)
+                        {
+                            <div class="big-score">@r.Average.ToString("0.0")</div>
+                            <partial name="_Stars" model="r.Average" />
+                            <div class="text-muted small mt-1">@r.Count değerlendirme</div>
+                            <div class="mt-3">
+                                @for (var s = 5; s >= 1; s--)
+                                {
+                                    <div class="dist-row">
+                                        <span>@s <i class="bi bi-star-fill"></i></span>
+                                        <div class="dist-bar"><div style="width:@r.Percent(s)%"></div></div>
+                                        <span class="text-muted">@r.Distribution[s - 1]</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">Bu ürünü ilk sen değerlendir.</p>
+                        }
+                    </div>
+
+                    @if (Model.CanReview)
+                    {
+                        <form asp-action="AddReview" asp-route-id="@p.Id" method="post" class="review-form mt-4">
+                            <h3 class="h6 mb-2">Değerlendirmeni yaz</h3>
+                            <div class="star-input mb-1" role="radiogroup" aria-label="Puan">
+                                @for (var s = 5; s >= 1; s--)
+                                {
+                                    <input type="radio" id="star@(s)" name="NewReview.Rating" value="@s" checked="@(Model.NewReview.Rating == s)" />
+                                    <label for="star@(s)" title="@s yıldız"><i class="bi bi-star-fill"></i></label>
+                                }
+                            </div>
+                            <span asp-validation-for="NewReview.Rating" class="text-danger small d-block"></span>
+                            <textarea asp-for="NewReview.Comment" class="form-control mt-2" rows="4" maxlength="1000" placeholder="Ürünü nasıl buldun? (en az 10 karakter)"></textarea>
+                            <span asp-validation-for="NewReview.Comment" class="text-danger small"></span>
+                            <button class="btn btn-accent w-100 mt-2">Gönder</button>
+                        </form>
+                    }
+                    else if (userId is null)
+                    {
+                        <p class="small mt-4 mb-0"><a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@(Url.Action("Detail", new { id = p.Id }) + "#reviews")">Giriş yap</a> ve bu ürünü değerlendir.</p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mt-4 mb-0"><i class="bi bi-check2-circle"></i> Bu ürünü değerlendirdin, teşekkürler!</p>
+                    }
+                </div>
+
+                <div class="col-lg-8">
+                    @if (!r.Reviews.Any()) { <div class="empty-state">Henüz yorum yapılmamış.</div> }
+                    @foreach (var rev in r.Reviews)
+                    {
+                        <article class="review">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <strong>@rev.AuthorName</strong>
+                                    @if (rev.IsVerifiedPurchase) { <span class="verified"><i class="bi bi-patch-check-fill"></i> Satın aldı</span> }
+                                    <div><partial name="_Stars" model="(double)rev.Rating" /></div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-muted">@rev.CreatedDate.ToLocalTime().ToString("d MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</small>
+                                    @if (isAdmin || (userId is not null && rev.UserId == userId))
+                                    {
+                                        <form asp-action="DeleteReview" asp-route-id="@p.Id" asp-route-reviewId="@rev.Id" method="post" onsubmit="return confirm('Bu değerlendirme silinsin mi?')">
+                                            <button class="btn btn-link btn-sm p-0 text-danger" title="Sil"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                            <p class="mb-0 mt-2">@rev.Comment</p>
+                        </article>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade @(openTab == "returns" ? "show active" : "")" id="tab-returns" role="tabpanel">
+            <partial name="_ReturnPolicy" />
+        </div>
+    </div>
+</section>
+
+@if (Model.Related.Any())
+{
+    <section class="mt-5">
+        <h2 class="h5 mb-3">Bu ürüne bakıyorsanız bunlarla da ilgilenebilirsiniz</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            @foreach (var item in Model.Related)
+            {
+                <div class="col"><partial name="_ProductCard" model="item" /></div>
+            }
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        function openTab(name) {
+            const btn = document.querySelector(`[data-bs-target="#tab-${name}"]`);
+            if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+        }
+        document.querySelectorAll('[data-open-tab]').forEach(a => a.addEventListener('click', e => {
+            e.preventDefault();
+            openTab(a.dataset.openTab);
+            document.getElementById('details').scrollIntoView({ behavior: 'smooth' });
+        }));
+        if (location.hash === '#reviews') {
+            openTab('reviews');
+            document.getElementById('details').scrollIntoView();
+        }
+    </script>
+}
